@@ -1,4 +1,4 @@
-@import 'themes/packages/@vivliostyle/theme-gutenberg/alice.css';
+@import 'themes/packages/@vivliostyle/theme-gutenberg/sherlock.css';
 
 @page :first {
   background-image: url(cover.png);

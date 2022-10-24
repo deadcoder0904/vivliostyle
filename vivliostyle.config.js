@@ -30,7 +30,7 @@ module.exports = {
   ],
   // workspaceDir: '.vivliostyle', // directory which is saved intermediate files.
   // toc: 'toc.html', // whether generate and include ToC HTML or not, default to 'false'.
-  // tocTitle: 'table of contents',
+  tocTitle: 'table of contents',
   cover: './cover.png', // cover image. default to undefined.
   // vfm: { // options of VFM processor
   //   hardLineBreaks: true, // converts line breaks of VFM to <br> tags. default to 'false'.
