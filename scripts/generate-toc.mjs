@@ -7,15 +7,14 @@ import path from 'path'
  * unified imports
  */
 import { unified } from 'unified'
-import { readSync, writeSync } from 'to-vfile'
+import { visit } from 'unist-util-visit'
+import { read, write } from 'to-vfile'
 
 /**
  * remark imports
  */
-import { remark } from 'remark'
 import remarkRehype from 'remark-rehype'
 import remarkParse from 'remark-parse'
-import remarkToc from 'remark-toc'
 
 /**
  * rehype imports
@@ -35,9 +34,23 @@ import slugify from '@sindresorhus/slugify'
  */
 import vivliostyleConfig from '../vivliostyle.config.js'
 
+const readMarkdownFiles = async (mdFilePaths, entryContext) => {
+  return (
+    await Promise.all(
+      mdFilePaths.map(async (md) => {
+        const content = await read(path.join(entryContext, md), {
+          encoding: 'utf8',
+        })
+        return content.value
+      })
+    )
+  ).join('\n\n')
+}
+
 const main = async () => {
-  // read entry from vivliostyle.config.js in order & then change toc.html
+  // read entry from vivliostyle.config.js in order & then change toc.html to contain only toc
   const { title, entry, entryContext, toc, tocTitle } = vivliostyleConfig
+
   let tocCss = ''
 
   const mdFilePaths = entry.filter((e) => {
@@ -50,17 +63,7 @@ const main = async () => {
     }
   })
 
-  let markup = ''
-
-  mdFilePaths.forEach((md) => {
-    const content = readSync(path.join(entryContext, md))
-    markup += content
-  })
-
-  writeSync({
-    path: 'temp.md',
-    value: markup,
-  })
+  const markup = await readMarkdownFiles(mdFilePaths, entryContext)
 
   const link = [
     {
@@ -72,12 +75,27 @@ const main = async () => {
 
   if (tocCss.length !== 0) {
     link.push({
-      href: tocCss,
+      href: `./${tocCss}`,
       rel: 'stylesheet',
     })
   }
 
+  const tree = unified().use(remarkParse).parse(markup)
+
   let lis = []
+  let n = 1
+
+  visit(tree, (node) => {
+    if (node.type === 'heading') {
+      const noOfHastags = '#'.repeat(node.depth)
+      const href =
+        node.depth === 1
+          ? mdFilePaths[n - 1].replace(/[0-9]+/g, n++).replace('.md', '.html')
+          : `#${slugify(node.children[0].value)}`
+      const value = `${noOfHastags} ${node.children[0].value}`
+      lis.push({ href, value })
+    }
+  })
 
   const processor = await unified()
     .use(remarkParse, { fragment: true })
@@ -85,9 +103,6 @@ const main = async () => {
     .use(rehypeDocument, {
       title,
       link,
-    })
-    .use(rehypeRewrite, {
-      rewrite: (node, index, parent) => {},
     })
     .use(rehypeRewrite, {
       rewrite: (node, index, parent) => {
@@ -101,27 +116,12 @@ const main = async () => {
             node.tagName == 'h6') &&
           !node.properties.id
         ) {
-          console.log('headers')
           if (
             node.children[0].value === title ||
             node.children[0].value === tocTitle
           )
             return
-          const noOfHastags = '#'.repeat(Number(node.tagName.replace('h', '')))
-          const href =
-            node.tagName === 'h1'
-              ? 'chapter1/index.html'
-              : slugify(node.children[0].value)
-          const value = `${noOfHastags} ${node.children[0].value}`
-          lis.push({ href, value })
-          console.log({ lis })
-          node.children = [
-            {
-              ...node.children[0],
-              properties: { id: slugify(node.children[0].value) },
-              children: [{ type: 'text', value: node.children[0].value }],
-            },
-          ]
+          node.properties.id = slugify(node.children[0].value)
         }
 
         if (node.type === 'element' && node.tagName === 'body') {
@@ -145,7 +145,7 @@ const main = async () => {
                   tagName: 'h2',
                   properties: {},
                   children: [
-                    { type: 'text', value: tocTitle || 'Table of Contents' },
+                    { type: 'text', value: tocTitle || 'table of contents' },
                   ],
                 },
                 {
@@ -153,8 +153,8 @@ const main = async () => {
                   tagName: 'ol',
                   properties: {},
                   children: lis.map((li) => {
-                    const text = li.replaceAll('#', '').trim()
-                    const depth = li.match(/#/g || []).length
+                    const text = li.value.replaceAll('#', '').trim()
+                    const depth = li.value.match(/#/g || []).length
 
                     let properties = {
                       href: li.href,
@@ -190,7 +190,6 @@ const main = async () => {
                 },
               ],
             },
-            ...node.children,
           ]
         }
       },
@@ -199,30 +198,13 @@ const main = async () => {
     .use(rehypeStringify)
 
   try {
-    const tocContent = await remark()
-      // .use(remarkParse, { fragment: true })
-      // .use(remarkRehype)
-      // .use(rehypeStringify)
-      .use(remarkToc)
-      .process(await readSync('temp.md'))
-
-    writeSync(tocContent)
     const file = await processor.process(markup)
     file.path = path.join(entryContext, 'toc')
     file.extname = '.html'
-    writeSync(file)
+    await write(file)
   } catch (error) {
     throw error
   }
-
-  console.log({
-    vivliostyleConfig,
-    entry,
-    entryContext,
-    toc,
-    tocTitle,
-    mdFilePaths,
-  })
 }
 
 main()

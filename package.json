@@ -4,9 +4,8 @@
   "version": "0.0.0",
   "author": "Akshay Kadam",
   "scripts": {
-    "prebuild": "npm run gen-toc",
+    "prebuild": "npm run generate-toc",
     "generate-toc": "node ./scripts/generate-toc.mjs",
-    "gen-toc": "node ./scripts/gen-toc.mjs",
     "build": "vivliostyle build",
     "preview": "vivliostyle preview"
   },
