@@ -1,4 +1,4 @@
-@import 'themes/packages/@vivliostyle/theme-gutenberg/theme_common.css';
+@import 'themes/packages/@vivliostyle/theme-gutenberg/alice.css';
 
 @page :first {
   background-image: url(cover.png);

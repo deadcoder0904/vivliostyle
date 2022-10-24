@@ -1,4 +1,4 @@
-# chatper2
+# chapter2
 
 ## generate pdf, epub, and mobi
 

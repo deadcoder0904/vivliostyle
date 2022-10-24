@@ -2,8 +2,11 @@
 
 ## write a book in markdown
 
-have a frontmatter.
+each chapter must have a `index.md` file. it can be anything.
+
+### have a frontmatter.
 
 frontmatter must contain `title`, `description`, `date`, and `author`.
+
 
 ![tiger](./tiger.png){width=100%}
