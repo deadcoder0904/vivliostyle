@@ -7,12 +7,12 @@
   "conformsTo": "https://github.com/vivliostyle/vivliostyle-cli",
   "author": "akshay kadam (a2k)",
   "inLanguage": "en",
-  "dateModified": "2022-10-19T17:27:34.976Z",
+  "dateModified": "2022-10-24T09:42:10.278Z",
   "name": "creating a book using markdown",
   "readingOrder": [
     {
-      "url": "index.html",
-      "name": "table of contents",
+      "url": "toc.html",
+      "name": "creating a book using markdown",
       "rel": "contents",
       "type": "LinkedResource"
     },

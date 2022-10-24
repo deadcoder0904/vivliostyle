@@ -7,6 +7,7 @@ module.exports = {
   entry: [
     {
       rel: 'contents',
+      path: 'toc.html',
       theme: 'top.css',
     },
     './chapter1/index.md',
@@ -28,8 +29,8 @@ module.exports = {
     },
   ],
   // workspaceDir: '.vivliostyle', // directory which is saved intermediate files.
-  toc: true, // whether generate and include ToC HTML or not, default to 'false'.
-  tocTitle: 'table of contents',
+  // toc: 'toc.html', // whether generate and include ToC HTML or not, default to 'false'.
+  // tocTitle: 'table of contents',
   cover: './cover.png', // cover image. default to undefined.
   // vfm: { // options of VFM processor
   //   hardLineBreaks: true, // converts line breaks of VFM to <br> tags. default to 'false'.

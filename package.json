@@ -4,12 +4,29 @@
   "version": "0.0.0",
   "author": "Akshay Kadam",
   "scripts": {
+    "prebuild": "npm run gen-toc",
+    "generate-toc": "node ./scripts/generate-toc.mjs",
+    "gen-toc": "node ./scripts/gen-toc.mjs",
     "build": "vivliostyle build",
     "preview": "vivliostyle preview"
   },
   "dependencies": {
     "@vivliostyle/cli": "latest",
-    "@vivliostyle/theme-gutenberg": "^0.1.1"
+    "@vivliostyle/theme-gutenberg": "^0.1.1",
+    "mdast-util-toc": "^6.1.0"
+  },
+  "devDependencies": {
+    "@sindresorhus/slugify": "^2.1.1",
+    "rehype-document": "^6.1.0",
+    "rehype-format": "^4.0.1",
+    "rehype-rewrite": "^3.0.6",
+    "rehype-stringify": "^9.0.3",
+    "remark": "^14.0.2",
+    "remark-rehype": "^10.1.0",
+    "remark-toc": "^8.0.1",
+    "to-vfile": "^7.2.3",
+    "unified": "^10.1.2",
+    "unist-util-visit": "^4.1.1"
   },
   "license": "MIT",
   "private": true

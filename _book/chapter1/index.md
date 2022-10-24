@@ -1,6 +1,6 @@
 # chapter1
 
-writing the book in markdown.
+## write a book in markdown
 
 have a frontmatter.
 

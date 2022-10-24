@@ -1,6 +1,6 @@
 # chatper2
 
-generate pdf, epub, and mobi
+## generate pdf, epub, and mobi
 
 first let's generate pdf.
 
