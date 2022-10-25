@@ -7,8 +7,8 @@ module.exports = {
   entry: [
     {
       rel: 'contents',
-      path: 'toc.html',
-      theme: 'top.css',
+      path: './toc.html',
+      theme: './top.css',
     },
     './chapter1/index.md',
     './chapter2/index.md',

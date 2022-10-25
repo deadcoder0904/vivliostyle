@@ -70,6 +70,10 @@ const main = async () => {
       href: 'publication.json',
       type: 'application/ld+json',
     },
+    {
+      href: './print.css',
+      rel: 'stylesheet',
+    },
   ]
 
   if (tocCss.length !== 0) {
