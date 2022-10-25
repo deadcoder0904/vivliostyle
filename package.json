@@ -11,10 +11,10 @@
   },
   "dependencies": {
     "@vivliostyle/cli": "latest",
-    "@vivliostyle/theme-gutenberg": "^0.1.1"
+    "@vivliostyle/theme-gutenberg": "^0.1.1",
+    "github-slugger": "^1.4.0"
   },
   "devDependencies": {
-    "@sindresorhus/slugify": "^2.1.1",
     "rehype-document": "^6.1.0",
     "rehype-format": "^4.0.1",
     "rehype-rewrite": "^3.0.6",

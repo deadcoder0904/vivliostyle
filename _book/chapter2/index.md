@@ -8,4 +8,6 @@ then we'll generate an epub.
 
 finally, we'll generate a mobi.
 
+## lion's pic
+
 ![lion](./lion.png){width=100%}

@@ -27,7 +27,7 @@ import rehypeFormat from 'rehype-format'
 /**
  * npm imports
  */
-import slugify from '@sindresorhus/slugify'
+import GithubSlugger from 'github-slugger'
 
 /**
  * local imports
@@ -35,35 +35,34 @@ import slugify from '@sindresorhus/slugify'
 import vivliostyleConfig from '../vivliostyle.config.js'
 
 const readMarkdownFiles = async (mdFilePaths, entryContext) => {
-  return (
-    await Promise.all(
-      mdFilePaths.map(async (md) => {
-        const content = await read(path.join(entryContext, md), {
-          encoding: 'utf8',
-        })
-        return content.value
+  return await Promise.all(
+    mdFilePaths.map(async (mdPath) => {
+      const content = await read(path.join(entryContext, mdPath), {
+        encoding: 'utf8',
       })
-    )
-  ).join('\n\n')
+      return { path: mdPath, content: content.value }
+    })
+  )
 }
 
 const main = async () => {
   // read entry from vivliostyle.config.js in order & then change toc.html to contain only toc
   const { title, entry, entryContext, toc, tocTitle } = vivliostyleConfig
+  const slugger = new GithubSlugger()
 
   let tocCss = ''
 
   const mdFilePaths = entry.filter((e) => {
     if (typeof e === 'string') {
-      return e
-    } else {
-      if (e.rel === 'contents') {
-        tocCss = e.theme
-      }
+      return true
     }
+    if (e.rel === 'contents') {
+      tocCss = e.theme
+    }
+    return false
   })
 
-  const markup = await readMarkdownFiles(mdFilePaths, entryContext)
+  const files = await readMarkdownFiles(mdFilePaths, entryContext)
 
   const link = [
     {
@@ -80,22 +79,27 @@ const main = async () => {
     })
   }
 
-  const tree = unified().use(remarkParse).parse(markup)
-
   let lis = []
   let n = 1
 
-  visit(tree, (node) => {
-    if (node.type === 'heading') {
-      const noOfHastags = '#'.repeat(node.depth)
-      const href =
-        node.depth === 1
-          ? mdFilePaths[n - 1].replace(/[0-9]+/g, n++).replace('.md', '.html')
-          : `#${slugify(node.children[0].value)}`
-      const value = `${noOfHastags} ${node.children[0].value}`
-      lis.push({ href, value })
-    }
+  files.forEach((file) => {
+    const tree = unified().use(remarkParse).parse(file.content)
+
+    visit(tree, (node) => {
+      if (node.type === 'heading') {
+        const noOfHastags = '#'.repeat(node.depth)
+        const htmlFilePath = file.path.replace('.md', '.html')
+        const href =
+          node.depth === 1
+            ? htmlFilePath
+            : `${htmlFilePath}#${slugger.slug(node.children[0].value)}`
+        const value = `${noOfHastags} ${node.children[0].value}`
+        lis.push({ href, value })
+      }
+    })
   })
+
+  const markup = files.map((file) => file.content).join('\n\n')
 
   const processor = await unified()
     .use(remarkParse, { fragment: true })
