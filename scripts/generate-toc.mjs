@@ -47,7 +47,8 @@ const readMarkdownFiles = async (mdFilePaths, entryContext) => {
 
 const main = async () => {
   // read entry from vivliostyle.config.js in order & then change toc.html to contain only toc
-  const { title, entry, entryContext, toc, tocTitle } = vivliostyleConfig
+  const { title, author, entry, entryContext, toc, tocTitle } =
+    vivliostyleConfig
   const slugger = new GithubSlugger()
 
   let tocCss = ''
@@ -71,14 +72,18 @@ const main = async () => {
       type: 'application/ld+json',
     },
     {
-      href: './print.css',
+      rel: 'preconnect',
+      href: 'https://rsms.me/',
+    },
+    {
       rel: 'stylesheet',
+      href: 'https://rsms.me/inter/inter.css',
     },
   ]
 
   if (tocCss.length !== 0) {
     link.push({
-      href: `./${tocCss}`,
+      href: tocCss,
       rel: 'stylesheet',
     })
   }
@@ -124,21 +129,29 @@ const main = async () => {
             node.tagName == 'h6') &&
           !node.properties.id
         ) {
-          if (
-            node.children[0].value === title ||
-            node.children[0].value === tocTitle
-          )
-            return
-          node.properties.id = slugify(node.children[0].value)
+          const entries = [title, tocTitle, author]
+          if (entries.includes(node.children[0].value)) return
+          node.properties.id = slugger.slug(node.children[0].value)
         }
 
         if (node.type === 'element' && node.tagName === 'body') {
+          node.properties = { class: 'prose' }
           node.children = [
             {
               type: 'element',
               tagName: 'h1',
-              properties: {},
+              properties: {
+                class: 'frontcover',
+              },
               children: [{ type: 'text', value: title }],
+            },
+            {
+              type: 'element',
+              tagName: 'h2',
+              properties: {
+                class: 'text-2xl',
+              },
+              children: [{ type: 'text', value: `by ${author}` }],
             },
             {
               type: 'element',

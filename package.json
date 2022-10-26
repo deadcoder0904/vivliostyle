@@ -5,8 +5,12 @@
   "author": "Akshay Kadam",
   "scripts": {
     "prebuild": "npm run generate-toc",
+    "tailwind": "tailwindcss -i ./_book/print.css -o ./_book/tailwind.css --watch",
     "generate-toc": "node ./scripts/generate-toc.mjs",
     "build": "vivliostyle build",
+    "dev": "concurrently \"npm:tailwind\" \"npm:preview\"",
+    "start": "concurrently \"npm:tailwind\" \"npm:build\"",
+    "prepreview": "npm run prebuild",
     "preview": "vivliostyle preview"
   },
   "dependencies": {
@@ -15,11 +19,14 @@
     "github-slugger": "^1.4.0"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.7",
+    "concurrently": "^7.5.0",
     "rehype-document": "^6.1.0",
     "rehype-format": "^4.0.1",
     "rehype-rewrite": "^3.0.6",
     "rehype-stringify": "^9.0.3",
     "remark-rehype": "^10.1.0",
+    "tailwindcss": "^3.2.1",
     "to-vfile": "^7.2.3",
     "unified": "^10.1.2",
     "unist-util-visit": "^4.1.1"
